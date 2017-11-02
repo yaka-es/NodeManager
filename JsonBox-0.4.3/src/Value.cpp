@@ -227,27 +227,27 @@ namespace JsonBox {
 			if (type == rhs.type) {
 				switch (type) {
 				case STRING:
-					result = (*data.stringValue == *data.stringValue);
+					result = (*data.stringValue == *rhs.data.stringValue);
 					break;
 
 				case INTEGER:
-					result = (*data.intValue == *data.intValue);
+					result = (*data.intValue == *rhs.data.intValue);
 					break;
 
 				case DOUBLE:
-					result = (*data.doubleValue == *data.doubleValue);
+					result = (*data.doubleValue == *rhs.data.doubleValue);
 					break;
 
 				case OBJECT:
-					result = (*data.objectValue == *data.objectValue);
+					result = (*data.objectValue == *rhs.data.objectValue);
 					break;
 
 				case ARRAY:
-					result = (*data.arrayValue == *data.arrayValue);
+					result = (*data.arrayValue == *rhs.data.arrayValue);
 					break;
 
 				case BOOLEAN:
-					result = (*data.boolValue == *data.boolValue);
+					result = (*data.boolValue == *rhs.data.boolValue);
 					break;
 
 				default:
@@ -273,27 +273,27 @@ namespace JsonBox {
 			if (type == rhs.type) {
 				switch (type) {
 				case STRING:
-					result = (*data.stringValue < *data.stringValue);
+					result = (*data.stringValue < *rhs.data.stringValue);
 					break;
 
 				case INTEGER:
-					result = (*data.intValue < *data.intValue);
+					result = (*data.intValue < *rhs.data.intValue);
 					break;
 
 				case DOUBLE:
-					result = (*data.doubleValue < *data.doubleValue);
+					result = (*data.doubleValue < *rhs.data.doubleValue);
 					break;
 
 				case OBJECT:
-					result = (*data.objectValue < *data.objectValue);
+					result = (*data.objectValue < *rhs.data.objectValue);
 					break;
 
 				case ARRAY:
-					result = (*data.arrayValue < *data.arrayValue);
+					result = (*data.arrayValue < *rhs.data.arrayValue);
 					break;
 
 				case BOOLEAN:
-					result = (*data.boolValue < *data.boolValue);
+					result = (*data.boolValue < *rhs.data.boolValue);
 					break;
 
 				default:
@@ -317,27 +317,27 @@ namespace JsonBox {
 			if (type == rhs.type) {
 				switch (type) {
 				case STRING:
-					result = (*data.stringValue > *data.stringValue);
+					result = (*data.stringValue > *rhs.data.stringValue);
 					break;
 
 				case INTEGER:
-					result = (*data.intValue > *data.intValue);
+					result = (*data.intValue > *rhs.data.intValue);
 					break;
 
 				case DOUBLE:
-					result = (*data.doubleValue > *data.doubleValue);
+					result = (*data.doubleValue > *rhs.data.doubleValue);
 					break;
 
 				case OBJECT:
-					result = (*data.objectValue > *data.objectValue);
+					result = (*data.objectValue > *rhs.data.objectValue);
 					break;
 
 				case ARRAY:
-					result = (*data.arrayValue > *data.arrayValue);
+					result = (*data.arrayValue > *rhs.data.arrayValue);
 					break;
 
 				case BOOLEAN:
-					result = (*data.boolValue	> *data.boolValue);
+					result = (*data.boolValue > *rhs.data.boolValue);
 					break;
 
 				default:

@@ -1,52 +1,54 @@
-/*
-* Copyright 2013, 2014 Range Networks, Inc.
-*
-*
-* This software is distributed under the terms of the GNU Affero Public License.
-* See the COPYING file in the main directory for details.
-*
-* This use of this software may be subject to additional restrictions.
-* See the LEGAL file in the main directory for details.
+/* NodeManager/NodeManager.cpp */
+/*-
+ * Copyright 2013, 2014 Range Networks, Inc.
+ *
+ * This software is distributed under the terms of the GNU Affero Public License.
+ * See the COPYING file in the main directory for details.
+ *
+ * This use of this software may be subject to additional restrictions.
+ * See the LEGAL file in the main directory for details.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-	This program is free software: you can redistribute it and/or modify
-	it under the terms of the GNU Affero General Public License as published by
-	the Free Software Foundation, either version 3 of the License, or
-	(at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU Affero General Public License for more details.
-
-	You should have received a copy of the GNU Affero General Public License
-	along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-*/
-
-#include "NodeManager.h"
 #include <stdio.h>
 
+#include "NodeManager.h"
+
 // TODO : not a member of NodeManager, fails to compile...
-void* NodeManager::commandsLoop(void*)
+void *NodeManager::commandsLoop(void *)
 {
 	// TODO : i hate this, need to figure out a way to satisfy the compiler and pass
 	// NodeManager::worker directly to mServer.start();
 	// (pat) You make it a static method and call it via NodeManager::commandLoop.
-	// In general, 'this' would be passed as the void* arg, which allows multiple instances, instead of using gNodeManager.
+	// In general, 'this' would be passed as the void* arg, which allows multiple instances, instead of using
+	// gNodeManager.
 
 	extern NodeManager gNodeManager;
 	try {
 		// This errors out when OpenBTS exits.
 		gNodeManager.commandsWorker(NULL);
 	} catch (...) {
-		LOG(INFO) << "Exception occurred in NodeManager";	// (pat 3-2014) added.  Evidently this happens regularly, so make it an INFO message.
+		LOG(INFO) << "Exception occurred in NodeManager"; // (pat 3-2014) added.  Evidently this happens
+								  // regularly, so make it an INFO message.
 	}
 	return NULL;
 }
 
-void* NodeManager::commandsWorker(void *)
+void *NodeManager::commandsWorker(void *)
 {
-	while(1) {
+	while (1) {
 		JsonBox::Value in;
 		JsonBox::Value out;
 		JsonBox::Object jsonIn;
@@ -82,12 +84,14 @@ void NodeManager::start(int commandsPort, int eventsPort)
 
 	signal(SIGPIPE, SIG_IGN);
 	snprintf(commandsAddress, sizeof(commandsAddress), "tcp://127.0.0.1:%d", commandsPort);
-	// (pat 3-2014) The zmq library throws a standard exception if it cannot bind, with no useful description in the exception whatsoever.
+	// (pat 3-2014) The zmq library throws a standard exception if it cannot bind, with no useful description in the
+	// exception whatsoever.
 	try {
 		mCommandsSocket.bind(commandsAddress);
 	} catch (...) {
-		LOG(EMERG) << "Could not bind commandsAddress: " << commandsAddress << " (possibly in use?)  Exiting...";
-		exit(0);	// Thats it.
+		LOG(EMERG) << "Could not bind commandsAddress: " << commandsAddress
+			   << " (possibly in use?)  Exiting...";
+		exit(0); // Thats it.
 	}
 	mCommandsServer.start(NodeManager::commandsLoop, NULL);
 
@@ -96,7 +100,8 @@ void NodeManager::start(int commandsPort, int eventsPort)
 		try {
 			mEventsSocket.bind(eventsAddress);
 		} catch (...) {
-			LOG(EMERG) << "Could not bind eventsAddress: " << eventsAddress << " (possibly in use?)  Exiting...";
+			LOG(EMERG) << "Could not bind eventsAddress: " << eventsAddress
+				   << " (possibly in use?)  Exiting...";
 			exit(0);
 		}
 	}
@@ -106,17 +111,17 @@ std::string NodeManager::readRequest()
 {
 	zmq::message_t payload;
 	mCommandsSocket.recv(&payload);
-	return std::string(static_cast<char*>(payload.data()), payload.size());
+	return std::string(static_cast<char *>(payload.data()), payload.size());
 }
 
-void NodeManager::writeResponse(const std::string& message)
+void NodeManager::writeResponse(const std::string &message)
 {
 	zmq::message_t payload(message.length());
-	memcpy((void *) payload.data(), message.c_str(), message.length());
+	memcpy((void *)payload.data(), message.c_str(), message.length());
 	mCommandsSocket.send(payload);
 }
 
-void NodeManager::publishEvent(const std::string& name, const std::string& version, const JsonBox::Object& data)
+void NodeManager::publishEvent(const std::string &name, const std::string &version, const JsonBox::Object &data)
 {
 	ScopedLock lock(mLock);
 	std::stringstream ss;
@@ -139,7 +144,7 @@ void NodeManager::publishEvent(const std::string& name, const std::string& versi
 	std::string message = ss.str();
 
 	zmq::message_t payload(message.length());
-	memcpy((void *) payload.data(), message.c_str(), message.length());
+	memcpy((void *)payload.data(), message.c_str(), message.length());
 	mEventsSocket.send(payload);
 }
 
@@ -153,7 +158,7 @@ JsonBox::Object NodeManager::version(JsonBox::Object command)
 	return response;
 }
 
-JsonBox::Object NodeManager::configKeyToJSON(const std::string& key)
+JsonBox::Object NodeManager::configKeyToJSON(const std::string &key)
 {
 	JsonBox::Object o;
 
@@ -256,17 +261,18 @@ JsonBox::Object NodeManager::config(JsonBox::Object command)
 	return response;
 }
 
-void NodeManager::setAppLogicHandler(JsonBox::Object (*wAppLogicHandler)(JsonBox::Object&))
+void NodeManager::setAppLogicHandler(JsonBox::Object (*wAppLogicHandler)(JsonBox::Object &))
 {
 	mAppLogicHandler = wAppLogicHandler;
 }
 
-void NodeManager::setAppConfigChangeHandler(bool (*wAppConfigChangeHandler)(std::string&, std::string&, std::string&))
+void NodeManager::setAppConfigChangeHandler(bool (*wAppConfigChangeHandler)(std::string &, std::string &,
+									    std::string &))
 {
 	mAppConfigChangeHandler = wAppConfigChangeHandler;
 }
 
-int NodeManager::addDirtyConfigurationKey(std::string& name, std::string& oldValue, std::string& newValue)
+int NodeManager::addDirtyConfigurationKey(std::string &name, std::string &oldValue, std::string &newValue)
 {
 	std::map<std::string, std::string>::iterator it = mDirtyConfigurationKeys.find(name);
 
@@ -274,7 +280,7 @@ int NodeManager::addDirtyConfigurationKey(std::string& name, std::string& oldVal
 	if (it == mDirtyConfigurationKeys.end()) {
 		mDirtyConfigurationKeys[name] = oldValue;
 
-	// key was already marked dirty, lets see if we can mark it clean
+		// key was already marked dirty, lets see if we can mark it clean
 	} else if (mDirtyConfigurationKeys[name] == newValue) {
 		mDirtyConfigurationKeys.erase(it);
 	}

@@ -34,9 +34,9 @@
 
 #include <zmq.hpp>
 
-#include <Globals.h>
-#include <Logger.h>
-#include <Threads.h>
+#include <CommonLibs/Logger.h>
+#include <CommonLibs/Threads.h>
+#include <Globals/Globals.h>
 
 #include <JsonBox.h>
 

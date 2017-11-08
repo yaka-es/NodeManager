@@ -266,8 +266,8 @@ void NodeManager::setAppLogicHandler(JsonBox::Object (*wAppLogicHandler)(JsonBox
 	mAppLogicHandler = wAppLogicHandler;
 }
 
-void NodeManager::setAppConfigChangeHandler(bool (*wAppConfigChangeHandler)(std::string &, std::string &,
-									    std::string &))
+void NodeManager::setAppConfigChangeHandler(
+	bool (*wAppConfigChangeHandler)(std::string &, std::string &, std::string &))
 {
 	mAppConfigChangeHandler = wAppConfigChangeHandler;
 }

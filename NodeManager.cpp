@@ -27,7 +27,7 @@
 #include "NodeManager.h"
 
 // TODO : not a member of NodeManager, fails to compile...
-void *NodeManager::commandsLoop(void *)
+void *NodeManager::commandsLoop(void *arg)
 {
 	// TODO : i hate this, need to figure out a way to satisfy the compiler and pass
 	// NodeManager::worker directly to mServer.start();
@@ -35,15 +35,17 @@ void *NodeManager::commandsLoop(void *)
 	// In general, 'this' would be passed as the void* arg, which allows multiple instances, instead of using
 	// gNodeManager.
 
-	extern NodeManager gNodeManager;
+	NodeManager *object = static_cast<NodeManager *>(arg);
+	void *ret = NULL;
+
 	try {
 		// This errors out when OpenBTS exits.
-		gNodeManager.commandsWorker(NULL);
+		ret = object->commandsWorker(NULL);
 	} catch (...) {
 		LOG(INFO) << "Exception occurred in NodeManager"; // (pat 3-2014) added.  Evidently this happens
 								  // regularly, so make it an INFO message.
 	}
-	return NULL;
+	return ret;
 }
 
 void *NodeManager::commandsWorker(void *)
@@ -93,7 +95,7 @@ void NodeManager::start(int commandsPort, int eventsPort)
 			   << " (possibly in use?)  Exiting...";
 		exit(0); // Thats it.
 	}
-	mCommandsServer.start(NodeManager::commandsLoop, NULL);
+	mCommandsServer.start(NodeManager::commandsLoop, static_cast<void *>(this));
 
 	if (eventsPort) {
 		snprintf(eventsAddress, sizeof(eventsAddress), "tcp://127.0.0.1:%d", eventsPort);

@@ -81,4 +81,6 @@ private:
 	JsonBox::Object configKeyToJSON(const std::string &key);
 };
 
+extern NodeManager *gNodeManager;
+
 #endif // _NODEMANAGER_H
